@@ -81,7 +81,8 @@ def load_to_minio(headers, tables):
 
 def main():
     csv_name, csv_info= scrape_website(HTML_URL)
-    load_to_minio(csv_name, csv_info)
+    if csv_info and csv_name is not None:
+        load_to_minio(csv_name, csv_info)
 
 if __name__ == "__main__":
     main()
