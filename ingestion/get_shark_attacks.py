@@ -1,7 +1,6 @@
 import requests
 from dotenv import load_dotenv
 import os
-import pandas as pd
 from minio import Minio
 from minio.error import S3Error
 from io import BytesIO
@@ -16,6 +15,8 @@ load_dotenv()
 
 logger = setup_logger('ingestion', 'shark_attacks_to_minio')
 
+delimiter= ','
+preserve_str_with_comma= "true"
 HTML_URL = os.getenv('SHARK_ATTACKS_CSV_DOWNLOAD')
 if not HTML_URL:
     logger.error("SHARK_ATTACKS_CSV_DOWNLOAD is not set in the environment variables.")
@@ -37,7 +38,10 @@ minio_client = Minio(
 def get_csv_data(url):
     try:
         logger.info(f"Downloading CSV data from {url}")
-        response = requests.get(url)
+        response = requests.get(url, params={
+            "delimiter": delimiter,
+            "quote_all": preserve_str_with_comma
+        })
         response.raise_for_status()
         response_bytes= response.content
         return response_bytes
