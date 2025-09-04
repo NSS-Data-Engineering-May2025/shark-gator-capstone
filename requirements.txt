@@ -1,4 +1,3 @@
-Beautifulsoup4
 requests
 dotenv
 pandas

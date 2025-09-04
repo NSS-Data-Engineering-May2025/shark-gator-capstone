@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 import pandas as pd
@@ -7,6 +6,9 @@ from minio import Minio
 from minio.error import S3Error
 from io import BytesIO
 from datetime import datetime, timezone
+
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from logs.setup_logger import setup_logger
 
 
@@ -14,9 +16,9 @@ load_dotenv()
 
 logger = setup_logger('ingestion', 'shark_attacks_to_minio')
 
-HTML_URL = os.getenv('SHARK_ATTACKS_HTML')
+HTML_URL = os.getenv('SHARK_ATTACKS_CSV_DOWNLOAD')
 if not HTML_URL:
-    logger.error("SHARK_ATTACKS_HTML is not set in the environment variables.")
+    logger.error("SHARK_ATTACKS_CSV_DOWNLOAD is not set in the environment variables.")
 
 # Credentials
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
@@ -32,46 +34,36 @@ minio_client = Minio(
     secure=False
 )
 
-def scrape_website(url):
+def get_csv_data(url):
     try:
-        logger.info(f"Fetching data from {url}")
+        logger.info(f"Downloading CSV data from {url}")
         response = requests.get(url)
-        response.raise_for_status()  
+        response.raise_for_status()
+        response_bytes= response.content
+        return response_bytes
     except requests.RequestException as e:
-        logger.error(f"Error fetching {url}: {e}")
+        logger.error(f"Error downloading CSV data: {e}")
         return None
-    
-    html = response.text
 
-    tables = pd.read_html(html)
-    
-    soup = BeautifulSoup(html, 'lxml')
-    headers = [h2.get_text(strip=True) for h2 in soup.find_all('h2')]
-    
-    return headers, tables
-
-def load_to_minio(headers, tables):
+def load_to_minio(csv_bytes):
     time_stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
-
     logger.info(f"MINIO_BUCKET_NAME:{MINIO_BUCKET_NAME!r} ({type(MINIO_BUCKET_NAME)})")
-
+    object_name = f"shark-gator-capstone/shark-attacks/Global-Shark-Attack-Database-{time_stamp}.csv"
+    logger.info(f"object_name: {object_name!r} ({type(object_name)})")
     try:
-        for header, table in zip(headers, tables):
-            object_name = f"shark-gator-capstone/shark-attacks/{header}-{time_stamp}.csv"
-            logger.info(f"object_name: {object_name!r} ({type(object_name)})")
-            logger.info(f"Writing data from {header} in {header}-{time_stamp}.csv to MinIO bucket {MINIO_BUCKET_NAME}")
-            csv_buffer = BytesIO()
-            table.to_csv(csv_buffer, index=False)
-            csv_buffer.seek(0)
+        csv_text = csv_bytes.decode('utf-8')
+        record_count = csv_text.count('\n')
+        csv_buffer = BytesIO(csv_bytes)
+        csv_buffer.seek(0)
 
-            minio_client.put_object(
-                bucket_name=MINIO_BUCKET_NAME,
-                object_name=object_name,
-                data=csv_buffer,
-                length=csv_buffer.getbuffer().nbytes,
-                content_type='application/octet-stream'
+        minio_client.put_object(
+            bucket_name=MINIO_BUCKET_NAME,
+            object_name=object_name,
+            data=csv_buffer,
+            length=csv_buffer.getbuffer().nbytes,
+            content_type='application/octet-stream'
             )
-            logger.info(f"Successfully uploaded {object_name}, {table.shape[0]} records uploaded into MinIO bucket {MINIO_BUCKET_NAME}.")
+        logger.info(f"Successfully uploaded {object_name}, {record_count} records uploaded into MinIO bucket {MINIO_BUCKET_NAME}.")
         logger.info("Finished loading all shark attack data to MinIO successfully.")
 
     except S3Error as s3_err:
@@ -80,9 +72,9 @@ def load_to_minio(headers, tables):
         logger.error(f"An unexpected error occurred during MinIO upload: {e}")
 
 def main():
-    csv_name, csv_info= scrape_website(HTML_URL)
-    if csv_info and csv_name is not None:
-        load_to_minio(csv_name, csv_info)
+    shark_bytes = get_csv_data(HTML_URL)
+    if shark_bytes is not None:
+        load_to_minio(shark_bytes)
 
 if __name__ == "__main__":
     main()

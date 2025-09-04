@@ -5,8 +5,11 @@ from minio import Minio
 from minio.error import S3Error
 from io import BytesIO
 from datetime import datetime, timezone
-from logs.setup_logger import setup_logger
 import pandas as pd
+
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from logs.setup_logger import setup_logger
 
 load_dotenv()
 
