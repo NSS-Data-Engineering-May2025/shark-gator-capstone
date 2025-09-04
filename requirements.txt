@@ -1,3 +1,5 @@
-Beautifulsoup4
 requests
 dotenv
+pandas
+minio
+lxml
