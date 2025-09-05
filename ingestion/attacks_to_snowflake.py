@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-import logging
 import os
 from minio import Minio, S3Error
 import pandas as pd
