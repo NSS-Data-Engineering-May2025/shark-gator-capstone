@@ -17,7 +17,7 @@ By combining these datasets, the project enables spatial and temporal analysis o
 
 ## Data Sources
 
-- **Global Shark Attack Database (CSV Download)**
+- **Global Shark Attack Database**
   - [Opendatasoft Shark Attacks](https://public.opendatasoft.com/explore/dataset/global-shark-attack/export/?disjunctive.country&disjunctive.area&disjunctive.activity&sort=-original_order)
 - **Crocattack.org**  
   - [Crocodile/Alligator Attack API & Database](https://crocattack.org/database/)
