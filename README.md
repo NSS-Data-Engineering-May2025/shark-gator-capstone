@@ -17,8 +17,6 @@ By combining these datasets, the project enables spatial and temporal analysis o
 
 ## Data Sources
 
-- **International Shark Attack Files (ISAF)**  
-  - [Global Shark Attack Locations](https://www.floridamuseum.ufl.edu/shark-attacks/trends/location/world/)
 - **Global Shark Attack Database (CSV Download)**
   - [Opendatasoft Shark Attacks](https://public.opendatasoft.com/explore/dataset/global-shark-attack/export/?disjunctive.country&disjunctive.area&disjunctive.activity&sort=-original_order)
 - **Crocattack.org**  
@@ -26,8 +24,6 @@ By combining these datasets, the project enables spatial and temporal analysis o
 - **IUCN Red List**
   - [Crocodilian Population Trends](https://www.iucnredlist.org/search?permalink=0894a85e-f70f-4b81-bb47-07a80bdd4786)
   - [Shark Population Trends](https://www.iucnredlist.org/search?permalink=f095bdae-5a22-409c-af51-82353602ea89)
-- **Movebank.org** (Stretch Goal)
-  - Movement tracking data (integration planned for future)
 
 ---
 
@@ -38,6 +34,7 @@ By combining these datasets, the project enables spatial and temporal analysis o
 | Python Scripts  | Data Ingestion            | Extract data (API calls, CSV downloads, web scraping)           |
 | MinIO           | Raw Data Lake             | Store raw JSON/CSV files                                        |
 | Snowflake       | Analytical Engine         | Queryable storage, transformations                              |
+**Not past this point yet (wip)**
 | DBT             | Data Transformation       | ELT, schema alignment, cleaning, metrics computation            |
 | Airflow         | Orchestration             | Automate and schedule pipeline                                  |
 | FastAPI + Swagger | Semantic Layer/API      | Documented endpoints, external access to metrics                |
@@ -47,26 +44,19 @@ By combining these datasets, the project enables spatial and temporal analysis o
 
 ## Current Pipeline Workflow
 
-1. **Automated Ingestion**  
-   - Airflow triggers Python scripts to fetch attack and population data (see above).
+1. **Ingestion**  
+   - Python scripts to fetch attack data (see above).
+   - Manually downloaded IUCN Red List Search Results.
    - Raw data stored in MinIO.
 
 2. **Bronze Layer Creation**  
    - Load raw files into Snowflake structured tables.
 
-3. **Transformation & Modeling**  
-   - DBT normalizes, aligns schema, and cleans data (esp. date, lat/long).
-   - Derived metrics: habitat overlap indices, aggression density, mortality rates.
-
-4. **API Access**  
-   - FastAPI exposes endpoints for querying metrics, documented via Swagger.
-
-5. **Visualization**  
-   - Metabase or Streamlit dashboards allow interactive exploration.
+3. **Transformation & Modeling**   
 
 ---
 
-## Actionable Insights
+## Potential Actionable Insights
 
 - **Ecological Research**: Reveals predator interaction zones.
 - **Predator Dynamics**: Explore aggression patterns in overlap regions.
@@ -77,7 +67,7 @@ By combining these datasets, the project enables spatial and temporal analysis o
 
 ## Project Journal & Development Lessons
 
-- **Webscraping**: BeautifulSoup chosen for static HTML; Selenium unnecessary.
+- **Webscraping**: BeautifulSoup chosen for static HTML; Selenium unnecessary (found more robust datasource lead to **Pipeline Changes**).
 - **APIs**: Network tab in browser helped discover undocumented endpoints.
 - **Data Wrangling**: Real-world data is messy; manual download often required (IUCN, population CSVs).
 - **Pivoting**: Movement data integration deferred due to availability challenges; attack and population data used as proxies for habitat overlap.
@@ -141,36 +131,21 @@ By combining these datasets, the project enables spatial and temporal analysis o
 
 ## Planned Features & Stretch Goals
 
-- Integrate movement data (Movebank) to enable direct spatial analysis.
-- Expand population trend data coverage.
-- Advanced visualizations (interactive maps, aggression heatmaps).
-- Automated quality checks for all ingested datasets.
-
----
-
-## Contributing
-
-Pull requests welcome!  
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## License
-
-[MIT](LICENSE)
+- Integrate movement data to enable direct spatial analysis.
+- Expand population trend and attack data.
+- Automation for all ingested datasets.
 
 ---
 
 ## Contact
 
 Lead: Helen Esterman  
-For questions, suggestions, or collaboration, open an issue or email [your-email@example.com].
+For questions, suggestions, or collaboration, open an issue or email helenesterman99@gmail.com.
 
 ---
 
 ## Acknowledgments
 
-- Florida Museum of Natural History (ISAF)
+- Global Shark Attack File (GSAF)
 - Crocattack.org
 - IUCN Red List
-- Movebank.org
