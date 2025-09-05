@@ -3,3 +3,5 @@ dotenv
 pandas
 minio
 lxml
+dbt-snowflake
+snowflake-connector-python[pandas]
