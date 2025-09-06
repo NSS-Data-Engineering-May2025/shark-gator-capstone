@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: bronze_source
+    database: SHARK_GATOR_DB
+    schema: BRONZE
+    tables:
+      - name: RAW_GATOR_ATTACKS
+        identifier: '"RAW_GATOR_ATTACKS"'  # case-sensitive matching
+        
+
+      - name: RAW_SHARK_ATTACKS
+        identifier: '"RAW_SHARK_ATTACKS"' 
