@@ -1,3 +1,7 @@
-Beautifulsoup4
 requests
 dotenv
+pandas
+minio
+lxml
+dbt-snowflake
+snowflake-connector-python[pandas]
