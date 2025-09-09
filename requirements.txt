@@ -5,3 +5,4 @@ minio
 lxml
 dbt-snowflake
 snowflake-connector-python[pandas]
+dbt-core
