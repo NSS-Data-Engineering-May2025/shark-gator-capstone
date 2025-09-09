@@ -1,7 +1,6 @@
 {{config(
-    materialized='incremental',
+    materialized='view',
     tags= ['staging', 'silver', 'attacks', 'gators', 'monthly'],
-    unique_key='ATTACK_ID',
 )}}
 
 SELECT DISTINCT
