@@ -1,6 +1,6 @@
 {{config(
     materialized='incremental',
-    tags= ['staging', 'silver', 'attacks', 'gators', 'weekly'],
+    tags= ['staging', 'silver', 'attacks', 'gators', 'monthly'],
     unique_key='ATTACK_ID',
 )}}
 

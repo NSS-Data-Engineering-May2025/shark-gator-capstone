@@ -8,6 +8,24 @@ sources:
       - name: RAW_GATOR_ATTACKS
         identifier: '"RAW_GATOR_ATTACKS"'  # case-sensitive matching
         
-
       - name: RAW_SHARK_ATTACKS
         identifier: '"RAW_SHARK_ATTACKS"' 
+
+      - name: RAW_GATOR_RED_LIST_ASSESSMENTS
+        identifier: '"RAW_GATOR_RED_LIST_ASSESSMENTS"'
+
+      - name: RAW_GATOR_RED_LIST_COMMON_NAMES
+        identifier: '"RAW_GATOR_RED_LIST_COMMON_NAMES"'
+
+      - name: RAW_GATOR_RED_LIST_TAXONOMY
+        identifier: '"RAW_GATOR_RED_LIST_TAXONOMY"'
+
+      
+      - name: RAW_SHARK_RED_LIST_ASSESSMENTS
+        identifier: '"RAW_SHARK_RED_LIST_ASSESSMENTS"'
+
+      - name: RAW_SHARK_RED_LIST_COMMON_NAMES
+        identifier: '"RAW_SHARK_RED_LIST_COMMON_NAMES"'
+
+      - name: RAW_SHARK_RED_LIST_TAXONOMY
+        identifier: '"RAW_SHARK_RED_LIST_TAXONOMY"'
