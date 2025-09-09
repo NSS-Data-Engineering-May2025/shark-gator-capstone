@@ -1,7 +1,6 @@
 {{config(
-    materialized='incremental',
+    materialized='view',
     tags= ['staging', 'silver', 'red-list', 'sharks','monthly'],
-    unique_key='ASSESSMENT_ID',
 )}}
 
 SELECT DISTINCT
