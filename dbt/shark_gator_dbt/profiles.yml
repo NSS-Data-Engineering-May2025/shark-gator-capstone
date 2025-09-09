@@ -1,0 +1,14 @@
+shark_gator_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: WGUOAZT-HVB78672
+      user: dbt_user
+      password: Jelbelle353111zzz
+      role: dbt_role
+      database: SHARK_GATOR_DB
+      warehouse: COMPUTE_WH
+      schema: silver
+      threads: 1
+      client_session_keep_alive: False
