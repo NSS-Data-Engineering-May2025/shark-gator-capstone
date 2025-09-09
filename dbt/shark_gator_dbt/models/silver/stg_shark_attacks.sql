@@ -1,7 +1,6 @@
 {{config(
-    materialized='incremental',
+    materialized='view',
     tags= ['staging', 'silver', 'attacks', 'sharks','monthly'],
-    unique_key='ATTACK_ID',
 )}}
 
 WITH CLEANED_VALUES AS (
@@ -20,18 +19,14 @@ WITH CLEANED_VALUES AS (
             WHEN UPPER(COUNTRY) IN ('RED SEA', 'RED SEA?') THEN 'RED SEA'
             WHEN UPPER(COUNTRY) IN ('INDIAN OCEAN', 'INDIAN OCEAN?') THEN 'INDIAN OCEAN'
             WHEN UPPER(COUNTRY) IN ('SUDAN', 'SUDAN?') THEN 'SUDAN'
-            ELSE COUNTRY
+            ELSE UPPER(COUNTRY)
         END AS COUNTRY_CLEAN,
-        AREA,
-        LOCATION,
-        ACTIVITY,
         FATAL_Y_N,
         CASE
             WHEN UPPER(FATAL_Y_N) ILIKE '%Y%' THEN True
             WHEN UPPER(FATAL_Y_N) IN ('N', 'F') THEN False
             ELSE NULL
         END AS FATAL_OUTCOME,
-        SPECIES,
         SOURCE_FILE,
         LOAD_TIMESTAMP_UTC AS INGESTION_TIMESTAMP_UTC,
         CURRENT_TIMESTAMP() AS CLEANED_TIMESTAMP_UTC
