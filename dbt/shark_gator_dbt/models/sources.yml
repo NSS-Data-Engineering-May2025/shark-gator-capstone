@@ -29,3 +29,6 @@ sources:
 
       - name: RAW_SHARK_RED_LIST_TAXONOMY
         identifier: '"RAW_SHARK_RED_LIST_TAXONOMY"'
+
+      - name: RAW_SHARK_SPECIES_LOCATIONS
+        identifier: '"RAW_SHARK_SPECIES_LOCATIONS"'
