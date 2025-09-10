@@ -37,3 +37,9 @@ models:
         +materialized: view
       stg_shark_attacks:
         +materialized: view
+      stg_red_list_gators:
+        +materialized: view
+      stg_red_list_sharks:
+        +materialized: view
+      stg_shark_species_locations:
+        +materialized: view
