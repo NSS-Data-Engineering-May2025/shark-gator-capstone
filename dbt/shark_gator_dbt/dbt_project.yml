@@ -42,4 +42,9 @@ models:
       stg_red_list_sharks:
         +materialized: view
       stg_shark_species_locations:
-        +materialized: view
+        +materialized: table
+    gold:
+      sharks:
+        +materialized: table
+      gators:
+        +materialized: table
