@@ -32,3 +32,17 @@ sources:
 
       - name: RAW_SHARK_SPECIES_LOCATIONS
         identifier: '"RAW_SHARK_SPECIES_LOCATIONS"'
+
+  - name: silver_source
+    database: SHARK_GATOR_DB
+    schema: silver
+    tables:
+      - name: stg_shark_attacks
+        
+      - name: stg_red_list_sharks
+
+      - name: stg_shark_species_locations
+
+      - name: stg_gator_attacks
+
+      - name: stg_red_list_gators

@@ -5,7 +5,32 @@
 
 SELECT DISTINCT
 "INCIDENT_NUMBER" AS ATTACK_ID,
-"SPECIES" AS SPECIES,
+CASE "SPECIES"
+            WHEN 'TSCH' THEN 'Tomistoma schlegelii'
+            WHEN 'CYAC' THEN 'Caiman yacare'
+            WHEN 'CLAT' THEN 'Caiman latirostris'
+            WHEN 'CSIA' THEN 'Crocodylus siamensis'
+            WHEN 'CACU' THEN 'Crocodylus acutus'
+            WHEN 'MCAT' THEN 'Mecistops cataphractus'
+            WHEN 'CPAL' THEN 'Crocodylus palustris'
+            WHEN 'AMIS' THEN 'Alligator mississippiensis'
+            WHEN 'CSUC' THEN 'Caiman crocodilus'
+            WHEN 'MNIG' THEN 'Melanosuchus niger'
+            WHEN 'CINT' THEN 'Crocodylus intermedius'
+            WHEN 'CCRO' THEN 'Crocodylus rhombifer'
+            WHEN 'CPOR' THEN 'Crocodylus porosus'
+            WHEN 'CNIL' THEN 'Crocodylus niloticus'
+            WHEN 'CMOR' THEN 'Crocodylus moreletii'
+            WHEN 'CJOH' THEN 'Crocodylus johnstoni'
+            WHEN 'PPAL' THEN 'Paleosuchus palpebrosus'
+            WHEN 'ASIN' THEN 'Alligator sinensis'
+            WHEN 'PTRI' THEN 'Paleosuchus trigonatus'
+            WHEN 'CMIN' THEN 'Crocodylus mindorensis'
+            WHEN 'CNOV' THEN 'Crocodylus novaeguineae'
+            WHEN 'OTET' THEN 'Osteolaemus tetraspis'
+            WHEN 'GGAN' THEN 'Gavialis gangeticus'
+            ELSE NULL
+        END AS SPECIES,
 CAST("LATITUDE" AS FLOAT) AS LATITUDE,
 CAST("LONGITUDE" AS FLOAT) AS LONGITUDE,
 CASE
