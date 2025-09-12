@@ -38,14 +38,6 @@ MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 MINIO_URL_HOST_PORT = os.getenv('MINIO_EXTERNAL_URL')
 MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME')
 
-# Instantiate MinIO client
-minio_client = Minio(
-    endpoint=MINIO_URL_HOST_PORT,
-    access_key=MINIO_ACCESS_KEY,
-    secret_key=MINIO_SECRET_KEY,
-    secure=False
-)
-
 def fetch_api_data(endpoint):
     try:
         logger.info(f"Fetching data from {endpoint}")
@@ -65,6 +57,12 @@ def load_to_minio(data):
     logger.info(f"MINIO_BUCKET_NAME:{MINIO_BUCKET_NAME!r} ({type(MINIO_BUCKET_NAME)})")
 
     try:
+        minio_client = Minio(
+                endpoint=MINIO_URL_HOST_PORT,
+                access_key=MINIO_ACCESS_KEY,
+                secret_key=MINIO_SECRET_KEY,
+                secure=False
+            )
         object_name = f"shark-gator-capstone/gator-attacks/gator-attacks-{time_stamp}.csv"
         logger.info(f"object_name: {object_name!r} ({type(object_name)})")
         logger.info(f"Uploading data to MinIO bucket {MINIO_BUCKET_NAME} with object name {object_name}")
