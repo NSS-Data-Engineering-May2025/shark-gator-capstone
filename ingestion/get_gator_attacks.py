@@ -6,6 +6,8 @@ from minio.error import S3Error
 from io import BytesIO
 from datetime import datetime, timezone
 import pandas as pd
+import re
+from dateutil import parser
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -38,15 +40,45 @@ MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 MINIO_URL_HOST_PORT = os.getenv('MINIO_EXTERNAL_URL')
 MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME')
 
+def normalize_date(date_value):
+    # Try to parse as a full date
+    try:
+        return parser.parse(str(date_value)).date()
+    except Exception:
+        pass
+    # Try to extract a year
+    year_match = re.search(r'\b(20\d{2}|19\d{2})\b', str(date_value))
+    if year_match:
+        return int(year_match.group(0))
+    return None
+
 def fetch_api_data(endpoint):
     try:
         logger.info(f"Fetching data from api: {endpoint}")
         response = requests.get(endpoint)
         response.raise_for_status()
         data= response.json()['data']
-        gator_attacks_info= pd.DataFrame(data, columns=COLUMN_NAMES)
-        gator_attacks_csv= gator_attacks_info.to_csv(index=False)
-        return gator_attacks_csv
+        # ! WORK IN PROGRESS !#
+        date_column= data[7]
+        most_recent_updated_date= '2024-22-11'
+        most_recent_updated_year=
+        normalized_most_recent_date= normalize_date(most_recent_updated_date)
+        for date in date_column:
+            normalized_date= normalize_date(date)
+            if normalized_date is None or normalized_most_recent_date is None:
+                logger.info(f"Skipping unparseable date: {date}")
+                continue
+            if type(normalized_date) != type(normalized_most_recent_date):
+            if normalized_date > normalized_most_recent_date:
+                logger.info(f"New data available since last update on {most_recent_updated_date}.")
+                most_recent_updated_date= date
+                logger.info(f"Updating most recent date to {most_recent_updated_date}.")
+                gator_attacks_info= pd.DataFrame(data, columns=COLUMN_NAMES)
+                gator_attacks_csv= gator_attacks_info.to_csv(index=False)
+                return gator_attacks_csv
+            else:
+                logger.info(f"No new data available since last update on {most_recent_updated_date}.")
+                break
     except requests.RequestException as e:
         logger.error(f"Error fetching API data: {e}")
         return None
