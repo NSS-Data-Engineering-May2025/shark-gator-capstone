@@ -11,3 +11,5 @@ apache-airflow-providers-cncf-kubernetes # If using KubernetesExecutor, ensure i
 apache-airflow-providers-postgres
 pyarrow
 psycopg2-binary
+black
+pytest

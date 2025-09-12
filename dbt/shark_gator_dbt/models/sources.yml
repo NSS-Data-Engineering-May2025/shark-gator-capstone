@@ -44,5 +44,10 @@ sources:
       - name: stg_shark_species_locations
 
       - name: stg_gator_attacks
+        columns:
+          - name: ATTACK_ID
+            tests:
+              - not_null
+              - unique
 
       - name: stg_red_list_gators
