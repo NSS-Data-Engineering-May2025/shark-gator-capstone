@@ -208,3 +208,71 @@ __marimo__/
 
 
 *.log
+
+
+# Airflow and dbt generated files
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.db
+*.bak
+
+# Airflow SQLite DB (if present)
+airflow.db
+
+# Airflow webserver PID file
+airflow-webserver.pid
+
+# Airflow logs
+logs/
+*/logs/
+
+# Airflow compiled DAGs (if any)
+dags/__pycache__/
+dags/*.pyc
+
+# dbt build artifacts
+dbt/shark_gator_dbt/target/
+dbt/shark_gator_dbt/dbt_packages/
+dbt/shark_gator_dbt/logs/
+dbt/shark_gator_dbt/.user.yml
+
+# VS Code and devcontainer
+.vscode/
+.devcontainer/*.pyc
+.devcontainer/__pycache__/
+
+# Python virtual environments
+.venv/
+env/
+ENV/
+venv/
+env.bak/
+venv.bak/
+
+# Environment files
+.env
+.envrc
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# Docker
+**/postgres-db-volume/
+**/metabase-postgres-volume/
+
+# Misc
+*.sqlite3
+*.sqlite3-journal
+*.msgpack
+*.json
+*.gz
+*.zip
+*.tar
+*.tgz
+*.bak
+*.swp
+*.swo
