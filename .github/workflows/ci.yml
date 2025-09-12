@@ -50,7 +50,6 @@ jobs:
 
       - name: Run Python tests
         run: pytest tests/
-          pytest --cov=. --cov-report=xml
 
       - name: Install dbt
         run: pip install dbt-core dbt-snowflake
