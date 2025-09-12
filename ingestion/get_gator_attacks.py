@@ -40,7 +40,7 @@ MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME')
 
 def fetch_api_data(endpoint):
     try:
-        logger.info(f"Fetching data from {endpoint}")
+        logger.info(f"Fetching data from api: {endpoint}")
         response = requests.get(endpoint)
         response.raise_for_status()
         data= response.json()['data']
