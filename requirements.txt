@@ -13,3 +13,4 @@ pyarrow
 psycopg2-binary
 black
 pytest
+Flask-Limiter==3.3.1
