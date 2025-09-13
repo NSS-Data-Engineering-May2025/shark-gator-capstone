@@ -28,6 +28,10 @@ SNOWFLAKE_SCHEMA_BRONZE=os.getenv("SNOWFLAKE_SCHEMA_BRONZE")
 SNOWFLAKE_WAREHOUSE= os.getenv("SNOWFLAKE_WAREHOUSE")
 SNOWFLAKE_ROLE= os.getenv("SNOWFLAKE_ROLE")
 
+SPECIES_LOCATIONS_COLS = ["ORIGINAL_ORDER", "AREA", "LOCATION", "ACTIVITY", "SPECIES"]
+SHARK_SPECIES_LOCATION_TABLE = "RAW_SHARK_SPECIES_LOCATIONS"
+
+
 def get_data_from_minio(folder_name):
     logger.info(f"Fetching data from MINIO_BUCKET: {MINIO_BUCKET_NAME!r} ({type(MINIO_BUCKET_NAME)})")
     
@@ -105,7 +109,28 @@ def load_to_snowflake(target_table, minio_data):
     else:
         logger.error(f"Failed to load data to Snowflake table: {target_table!r}")
         raise Exception("Data loading to Snowflake using write_pandas failed.")
-
+    
+    # if time, refactor to make more effecient?
+    if target_table == "RAW_SHARK_ATTACKS":
+        logger.info("Loading messy species location data to separate table.")
+        species_locations_data = minio_data[SPECIES_LOCATIONS_COLS]
+        species_loc_table_name= SHARK_SPECIES_LOCATION_TABLE
+        success2, nchunks2, nrows2, _ = write_pandas(
+            conn=conn,
+            df=species_locations_data,
+            table_name=species_loc_table_name,
+            auto_create_table=True,
+            schema=SNOWFLAKE_SCHEMA_BRONZE,
+            database=SNOWFLAKE_DATABASE,
+            overwrite=True,
+            quote_identifiers=True,
+            use_logical_type=True
+        )
+        if success2:
+            logger.info(f"Species location data loaded successfully to Snowflake table: {species_loc_table_name!r} with {nrows2} rows and {nchunks2} chunks.")
+        else:
+            logger.error(f"Failed to load species location data to Snowflake table: {species_loc_table_name!r}")
+            raise Exception("Species location data loading to Snowflake using write_pandas failed.")
 
 
 def main():
