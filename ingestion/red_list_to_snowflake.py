@@ -28,7 +28,7 @@ SNOWFLAKE_SCHEMA_BRONZE = os.getenv("SNOWFLAKE_SCHEMA_BRONZE")
 SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE")
 SNOWFLAKE_ROLE = os.getenv("SNOWFLAKE_ROLE")
 
-def load_to_snowflake(folder_name, shark_or_gator):
+def get_data_from_minio(folder_name, shark_or_gator):
     logger.info(f"Fetching data from MINIO_BUCKET: {MINIO_BUCKET_NAME!r} ({type(MINIO_BUCKET_NAME)})")
     
     minio_client = Minio(
@@ -47,6 +47,7 @@ def load_to_snowflake(folder_name, shark_or_gator):
     if not objects_from_minio:
         logger.warning(f"No objects found in MinIO bucket: {MINIO_BUCKET_NAME} with prefix: shark-gator-capstone/{folder_name}/")
         raise Exception(f"No objects found in MinIO bucket: {MINIO_BUCKET_NAME} with prefix: shark-gator-capstone/{folder_name}/")
+    minio_objects= []
     for obj in objects_from_minio:
         if obj.object_name.endswith('.csv') and not obj.object_name.endswith('_with_html.csv'):
             logger.info(f"Found csv file: {obj.object_name}")
@@ -67,54 +68,64 @@ def load_to_snowflake(folder_name, shark_or_gator):
                 data['LOAD_TIMESTAMP_UTC'] = datetime.now(timezone.utc)
 
                 data.columns = data.columns.str.upper()
+
+                minio_objects.append((data, target_table))
                 
                 logger.info(f"Added {len(data)} rows from {obj.object_name} to queue")
-                try:
-                    conn = snowflake.connector.connect(
-                        account=SNOWFLAKE_ACCOUNT,
-                        user=SNOWFLAKE_USER,
-                        password=SNOWFLAKE_PASSWORD,
-                        warehouse=SNOWFLAKE_WAREHOUSE,
-                        database=SNOWFLAKE_DATABASE,
-                        schema=SNOWFLAKE_SCHEMA_BRONZE,
-                        role=SNOWFLAKE_ROLE
-                    )
-                    logger.info("Connected to Snowflake successfully.")
-                except Exception as e:
-                    logger.error(f"Error connecting to Snowflake: {e}")
-                    raise
-                success, nchunks, nrows, _ = write_pandas(
-                    conn=conn,
-                    df=data,
-                    table_name=target_table,
-                    auto_create_table=True,
-                    schema=SNOWFLAKE_SCHEMA_BRONZE,
-                    database=SNOWFLAKE_DATABASE,
-                    overwrite=True,
-                    quote_identifiers=True,  # had a column that included a '/' in the title
-                    use_logical_type=True  # Use logical types for better compatibility
-                )
-
-                if success:
-                    logger.info(f"Data loaded successfully to Snowflake table: {target_table!r} with {nrows} rows and {nchunks} chunks.")
-                else:
-                    logger.error(f"Failed to load data to Snowflake table: {target_table!r}")
-                    raise Exception("Data loading to Snowflake using write_pandas failed.")
-            
             except S3Error as s3_err:
                 logger.error(f"MinIO error for {obj.object_name}: {s3_err}")
             except Exception as e:
                 logger.error(f"An unexpected error occurred processing {obj.object_name}: {e}")
             
-        
+    return minio_objects
+
+
+def load_to_snowflake(conn,minio_data, table_name):
+    success, nchunks, nrows, _ = write_pandas(
+        conn=conn,
+        df=minio_data,
+        table_name=table_name,
+        auto_create_table=True,
+        schema=SNOWFLAKE_SCHEMA_BRONZE,
+        database=SNOWFLAKE_DATABASE,
+        overwrite=True,
+        quote_identifiers=True,  # had a column that included a '/' in the title
+        use_logical_type=True  # Use logical types for better compatibility
+    )
+
+    if success:
+        logger.info(f"Data loaded successfully to Snowflake table: {table_name!r} with {nrows} rows and {nchunks} chunks.")
+    else:
+        logger.error(f"Failed to load data to Snowflake table: {table_name!r}")
+        raise Exception("Data loading to Snowflake using write_pandas failed.")
+
 def main():
     SHARK_RED_LIST_FOLDER = "shark-red-list"
     GATOR_RED_LIST_FOLDER = "gator-red-list"
     SHARK_TABLE= "SHARK"
     GATOR_TABLE= "GATOR"
     try:
-        load_to_snowflake(SHARK_RED_LIST_FOLDER, SHARK_TABLE)
-        load_to_snowflake(GATOR_RED_LIST_FOLDER, GATOR_TABLE)
+        shark_datasets = get_data_from_minio(SHARK_RED_LIST_FOLDER, SHARK_TABLE)
+        gator_datasets = get_data_from_minio(GATOR_RED_LIST_FOLDER, GATOR_TABLE)
+        try:
+            conn = snowflake.connector.connect(
+                account=SNOWFLAKE_ACCOUNT,
+                user=SNOWFLAKE_USER,
+                password=SNOWFLAKE_PASSWORD,
+                warehouse=SNOWFLAKE_WAREHOUSE,
+                database=SNOWFLAKE_DATABASE,
+                schema=SNOWFLAKE_SCHEMA_BRONZE,
+                role=SNOWFLAKE_ROLE
+            )
+            logger.info("Connected to Snowflake successfully.")
+
+            for shark_data, shark_table_name in shark_datasets:
+                load_to_snowflake(conn, shark_data, shark_table_name)
+            for gator_data, gator_table_name in gator_datasets:
+                load_to_snowflake(conn, gator_data, gator_table_name)
+        except Exception as e:
+            logger.error(f"Error connecting to Snowflake: {e}")
+            raise
         logger.info("Red list data loaded to snowflake successfully.")
     except Exception as e:
         logger.error(f"Error loading red list data to Snowflake: {e}")
