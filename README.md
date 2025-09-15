@@ -1,151 +1,133 @@
-# Intersecting Predators: An Integrated Database of Shark and Crocodilian Aggression & Population Trends
+# Shark Gator Database
+_A Centralized Database of Shark and Crocodilian Attacks and Population Trends_
 
-**Status:** Work in Progress  
-**Stretch Goal:** Movement data integration planned for future phases.
+**Status:** MVP Complete  
+**Next Step:** Movement data enrichment (stretch goal)
 
 ---
 
-## Executive Summary
+## Project Overview
 
-This project builds a centralized, queryable database integrating shark and crocodilian (alligator & crocodile) attack data and species’ population trends.  
-**Central Question:**  
-_Do shark and crocodilian habitats intersect more than commonly assumed, and does that overlap correspond to increased aggression or influence species’ population trends?_
-
-By combining these datasets, the project enables spatial and temporal analysis of predator overlap, aggression, and population health, supporting ecological and behavioral research.
+Shark Gator Database is a modular data engineering pipeline centralizing global shark and crocodilian attack records, mapped to population trends.  
+Designed for anyone's research, this project demonstrates advanced ELT architecture, robust data cleaning, and automated analytics delivery via Metabase dashboards.
 
 ---
 
 ## Data Sources
 
-- **Global Shark Attack Database**
-  - [Opendatasoft Shark Attacks](https://public.opendatasoft.com/explore/dataset/global-shark-attack/export/?disjunctive.country&disjunctive.area&disjunctive.activity&sort=-original_order)
-- **Crocattack.org**  
-  - [Crocodile/Alligator Attack API & Database](https://crocattack.org/database/)
-- **IUCN Red List**
-  - [Crocodilian Population Trends](https://www.iucnredlist.org/search?permalink=0894a85e-f70f-4b81-bb47-07a80bdd4786)
-  - [Shark Population Trends](https://www.iucnredlist.org/search?permalink=f095bdae-5a22-409c-af51-82353602ea89)
+- **Crocattack.org API**  
+  - Global records of crocodile & alligator attacks ([API](https://crocattack.org/database/))
+- **Global Shark Attack File (GSAF) CSV Download**  
+  - Shark attack records from the 1500s to present ([GSAF CSV](https://public.opendatasoft.com/explore/dataset/global-shark-attack/table/?disjunctive.country&disjunctive.area&disjunctive.activity&sort=-original_order))
+- **IUCN Red List CSV Downloads**  
+  - Population, conservation status, & extinction risk for sharks and crocodilians ([Sharks](https://www.iucnredlist.org/search?permalink=f095bdae-5a22-409c-af51-82353602ea89), [Crocodilians](https://www.iucnredlist.org/search?permalink=0894a85e-f70f-4b81-bb47-07a80bdd4786))
 
 ---
 
-## Technical Architecture
+## Architecture & Technical Highlights
 
-| Technology      | Role                       | Purpose                                                         |
-|-----------------|---------------------------|-----------------------------------------------------------------|
-| Python Scripts  | Data Ingestion            | Extract data (API calls, CSV downloads, web scraping)           |
-| MinIO           | Raw Data Lake             | Store raw JSON/CSV files                                        |
-| Snowflake       | Analytical Engine         | Queryable storage, transformations                              |
-**Not past this point yet (wip)**
-| DBT             | Data Transformation       | ELT, schema alignment, cleaning, metrics computation            |
-| Airflow         | Orchestration             | Automate and schedule pipeline                                  |
-| FastAPI + Swagger | Semantic Layer/API      | Documented endpoints, external access to metrics                |
-| Metabase/Streamlit | BI & Visualization     | Dashboards for overlap, aggression, population trends           |
+**Pipeline: ELT Medallion Architecture, Automated by Airflow**
 
----
+- **Raw Ingestion (Python & Airflow)**
+  - API and CSV data are ingested and dropped into a raw MinIO bucket.
+- **Bronze Layer (Snowflake)**
+  - Raw files loaded as "bronze" tables for persistent storage.
+- **Silver Layer (DBT: SQL & Python)**
+  - Aggressive cleaning, normalization, and standardization.
+  - Used regex, fuzzy matching, and other techniques to resolve messy columns (e.g., species, location, dates).
+  - Standardized country/state names, created flags, and handled nulls with purpose.
+- **Gold Layer (DBT SQL)**
+  - Joins, aggregations, and analytics-ready tables.
+  - Linked attack records to population trends for both sharks and crocodilians.
+- **Visualization (Metabase)**
+  - Dashboards connect to Snowflake for interactive insights.
 
-## Current Pipeline Workflow
+**Orchestration:**
+- Automated via a robust Airflow DAG; each major step also has a dedicated DAG for manual testing and debugging.
+- Dev container used for environment consistency and lightweight iteration.
 
-1. **Ingestion**  
-   - Python scripts to fetch attack data (see above).
-   - Manually downloaded IUCN Red List Search Results.
-   - Raw data stored in MinIO.
-
-2. **Bronze Layer Creation**  
-   - Load raw files into Snowflake structured tables.
-
-3. **Transformation & Modeling**   
+**Testing & CI/CD:**
+- Pytest and GitHub Actions for error handling, unit tests, and pipeline reliability.
 
 ---
 
-## Potential Actionable Insights
+## Key Wins & Engineering Skills
 
-- **Ecological Research**: Reveals predator interaction zones.
-- **Predator Dynamics**: Explore aggression patterns in overlap regions.
-- **Population Monitoring**: Track health trends in stressed regions.
-- **Academic Research**: Unified data for hypothesis testing and analysis.
+- **Orchestration:** Overcame Airflow configuration and environment/versioning challenges, and automated the full pipeline.
+- **Data Cleaning:** Tackled messy real-world data using a mix of SQL, Python (Jupyter, pandas), and regex; discovered reusable fuzzy matching formulas for deduplication and standardization (e.g., “Florda” → “Florida”).
+- **EDA Efficiency:** Leveraged DuckDB and DataGrip for offline exploratory analysis, saving Snowflake query costs.
+- **CI/CD Integration:** Combined GitHub Actions and pytest to ensure effective error handling and pipeline reliability.
+- **Problem Solving:** Pivoted quickly when faced with inaccessible data (e.g., movement data), found better sources, and documented all major architectural decisions.
+- **Python Module Management:** Resolved persistent import issues and learned best practices for packaging and dependency management.
 
 ---
 
-## Project Journal & Development Lessons
+## Insights Delivered
 
-- **Webscraping**: BeautifulSoup chosen for static HTML; Selenium unnecessary (found more robust datasource lead to **Pipeline Changes**).
-- **APIs**: Network tab in browser helped discover undocumented endpoints.
-- **Data Wrangling**: Real-world data is messy; manual download often required (IUCN, population CSVs).
-- **Pivoting**: Movement data integration deferred due to availability challenges; attack and population data used as proxies for habitat overlap.
-- **CSV Handling**: Custom delimiter and quoting logic required for shark attack data.
-- **Data Cleaning**: Used SQL functions (`coalesce`, `try_to_date`) for robust date handling; maintained raw and cleaned columns for transparency.
-- **Python Imports**: Managed module dependencies via absolute paths and considered tools like Poetry for future refactoring.
-- **Pipeline Changes**: Directly ingest CSVs via HTTP requests where possible to minimize scraping overhead.
+- Shark vs. Gator Attack Counts by Country (Where Both Occur)
+- Shark vs. Gator Attacks Over Time (Years with Both Present)
+- Most Aggressive Sharks and Their Population Trends
+- Most Aggressive Crocodilians and Their Population Trends
+- Unified data platform for hypothesis testing regarding shark attacks, crocodilian attacks, and the population trends associated with each animal
 
 ---
 
 ## Getting Started
 
-> **Note:** This pipeline is under active development. Instructions below reflect current workflow.
-
 ### Prerequisites
 
 - Python 3.10+
-- Access to MinIO, Snowflake, Airflow, DBT
-- (Optional) FastAPI, Metabase/Streamlit
+- Airflow
+- MinIO
+- Snowflake account
+- DBT
+- Metabase
 
 ### Setup
 
 1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/NSS-Data-Engineering-May2025/shark-gator-capstone.git
-   cd shark-gator-capstone
-   ```
-
+    ```bash
+    git clone https://github.com/NSS-Data-Engineering-May2025/shark-gator-capstone.git
+    cd shark-gator-capstone
+    ```
 2. **Install Python Dependencies**
-
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. **Configure MinIO and Snowflake connections**  
-   Update `.env` or config files as needed.
-
-4. **Run Data Ingestion Scripts**
-
-   - See `scripts/` directory for ingestion scripts.
-   - Example:
-     ```bash
-     python scripts/ingest_shark_attacks.py
-     python scripts/ingest_croc_attacks.py
-     ```
-
-5. **Trigger Pipeline**
-   - Set up and run Airflow DAGs for end-to-end automation.
-
-6. **Run DBT Transformations**
-   - See `dbt/` project for models and tests.
-
-7. **Start FastAPI (Optional)**
-   - `uvicorn api:app --reload`
-
-8. **View Dashboards**
-   - Connect Metabase or Streamlit to Snowflake/your API.
+    ```bash
+    pip install -r requirements.txt
+    ```
+3. **Configure Connections**
+    - Update `.env` or config files for MinIO, Snowflake, Airflow.
+4. **Run Airflow DAG**
+    - Trigger the main pipeline DAG for full automation.
+    - Use manual DAGs for isolated debugging.
+5. **Run DBT**
+    - DBT project includes silver/gold models and tests.
+6. **Explore Insights**
+    - Connect Metabase to Snowflake and view dashboards.
 
 ---
 
-## Planned Features & Stretch Goals
+## Stretch Goals & Future Work
 
-- Integrate movement data to enable direct spatial analysis.
-- Expand population trend and attack data.
-- Automation for all ingested datasets.
+- Add semantic data layer (Cube.js) for more efficient analysis and cost control.
+- Strengthen orchestration: upgrade Airflow (v3, CeleryExecutor, Postgres) or explore Prefect/Dagster.
+- Enhance messy columns with lookup tables & indexing for faster joins.
+- Expand dataset with Movebank movement data for deeper insights.
+- Integrate GitHub Secret Keys into CI/CD GitHub Actions for secure, automated DBT Testing.
+- Expand dataset coverage and improve gold layer scalability.
 
 ---
 
 ## Contact
 
-Lead: Helen Esterman  
-For questions, suggestions, or collaboration, open an issue or email helenesterman99@gmail.com.
+Helen Esterman  
+Questions, suggestions, or collaboration: open an issue or email helenesterman99@gmail.com or connect with me on LinkedIn- www.linkedin.com/in/helenesterman
 
 ---
 
 ## Acknowledgments
 
-- Global Shark Attack File (GSAF)
-- Crocattack.org
+- Crocattack.org (API)
+- Global Shark Attack File (CSV)
 - IUCN Red List
+
+---
