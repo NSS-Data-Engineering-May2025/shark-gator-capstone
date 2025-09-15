@@ -24,8 +24,6 @@ RUN echo "airflow ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/airflow \
 
 RUN mkdir -p ${AIRFLOW_HOME}/dags \
            ${AIRFLOW_HOME}/logs \
-           ${AIRFLOW_HOME}/plugins \
-           ${AIRFLOW_HOME}/config \
            ${AIRFLOW_HOME}/ingestion && \
     chown -R airflow:airflow ${AIRFLOW_HOME} && \
     chmod -R 775 ${AIRFLOW_HOME}
