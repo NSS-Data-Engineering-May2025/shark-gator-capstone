@@ -1,0 +1,17 @@
+# pack-refs with: peeled fully-peeled sorted 
+883d705b0574bf2e8b3622ec41efa92fb190b926 refs/heads/dev
+db93b6a427426c0d167c563868655ed3a17da48f refs/heads/helen-dev-WIP
+b29271e52e17acf80e5b477ad1efc986a0891925 refs/heads/main
+16901a12215f8796fa941ba051efdfea4da6075e refs/pull/1/head
+2b66ddea92048baf049db0b0427532d01fc35d7e refs/pull/10/head
+025178c308a175b93b465214e9dc0e1994da2880 refs/pull/11/head
+b3fd1a382bb50955c36e07c1b974d43bda2be6ed refs/pull/12/head
+b29271e52e17acf80e5b477ad1efc986a0891925 refs/pull/13/head
+008987a12321468cf5def63641e94200fa889865 refs/pull/2/head
+b591d30cd841e48815b27eae572fc0d3c8acf533 refs/pull/3/head
+768f35a12819c4622b710aa7d4f2826166a5290e refs/pull/4/head
+81656217cd6315e764bb694747ac15ed86158311 refs/pull/5/head
+33958a44ae33f9b76ef07cb2df150706682a8f9c refs/pull/6/head
+7f26405c53a0d202b1099f7da05a229fe0719691 refs/pull/7/head
+50747781ec3887684eaf1c50fe059bd927c2fca4 refs/pull/8/head
+e0a91245c42a9cebd2634b5ee928374815437ea5 refs/pull/9/head
