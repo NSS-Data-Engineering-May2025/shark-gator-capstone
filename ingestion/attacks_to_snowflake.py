@@ -49,7 +49,7 @@ def get_data_from_minio(folder_name):
         recursive=True
         )
     for obj in objects_from_minio:
-        if obj.object_name.endswith('.csv'):
+        if obj.object_name.endswith('.csv') and obj.last_modified:
             logger.info(f"Found csv file: {obj.object_name}")
             try:
                 response= minio_client.get_object(
