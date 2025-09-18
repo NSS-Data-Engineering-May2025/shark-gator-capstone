@@ -49,7 +49,7 @@ def get_data_from_minio(folder_name, shark_or_gator):
         raise Exception(f"No objects found in MinIO bucket: {MINIO_BUCKET_NAME} with prefix: shark-gator-capstone/{folder_name}/")
     minio_objects= []
     for obj in objects_from_minio:
-        if obj.object_name.endswith('.csv') and not obj.object_name.endswith('_with_html.csv'):
+        if obj.object_name.endswith('.csv') and not obj.object_name.endswith('_with_html.csv') and obj.last_modified:
             logger.info(f"Found csv file: {obj.object_name}")
             file_name = os.path.splitext(os.path.basename(obj.object_name).split("-")[0])[0]
             target_table = f"RAW_{shark_or_gator}_RED_LIST_{file_name.upper().replace(' ', '_').replace('.csv','')}"
